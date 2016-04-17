@@ -9,6 +9,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/manyminds/api2go"
 	"github.com/timrourke/po/model"
+	"github.com/timrourke/po/constraints"
 	"log"
 )
 
@@ -22,9 +23,14 @@ type NounStorage struct {
 	db *sqlx.DB
 }
 
-func (s NounStorage) GetAllPaginated(offset uint64, limit uint64, sort string) (model.ResultSet, error) {
-	sqlString := fmt.Sprintf("SELECT * FROM noun ORDER BY %s LIMIT ?,?", sort)
-	rows, err := s.db.Queryx(sqlString, offset, limit)
+// Get all
+func (s NounStorage) GetAllPaginated(constraints constraints.Constraints) (model.ResultSet, error) {
+	fmt.Println("we have a constraints struct", constraints)
+	fmt.Sprintf("%+v", constraints)
+	fmt.Println("Sort val should be: ", constraints.Sort)
+	sqlString := fmt.Sprintf("SELECT * FROM noun ORDER BY %s LIMIT ?,?", constraints.Sort)
+	fmt.Println("sqlString", sqlString)
+	rows, err := s.db.Queryx(sqlString, constraints.Offset, constraints.Limit)
 	defer rows.Close()
 
 	if err != nil {
@@ -40,7 +46,6 @@ func (s NounStorage) GetAllPaginated(offset uint64, limit uint64, sort string) (
 		}
 		results = append(results, n)
 	}
-	fmt.Println("%+v", results)
 
 	var nounMap model.ResultSet
 	for i := 0; i < len(results); i++ {
@@ -50,7 +55,7 @@ func (s NounStorage) GetAllPaginated(offset uint64, limit uint64, sort string) (
 	return nounMap, nil
 }
 
-// // GetOne noun
+// Get one
 func (s NounStorage) GetOne(id string) (model.Noun, error) {
 	noun := model.Noun{}
 	err := s.db.Get(&noun, `SELECT * FROM noun WHERE ID = ? LIMIT 1`, id)
@@ -61,7 +66,7 @@ func (s NounStorage) GetOne(id string) (model.Noun, error) {
 	return noun, nil
 }
 
-// Insert a noun
+// Insert
 func (s *NounStorage) Insert(c model.Noun) (string, error) {
 	noun := `INSERT INTO noun (singular, plural) VALUES (?, ?)`
 	result, err := s.db.Exec(noun, c.Singular, c.Plural)
@@ -74,12 +79,13 @@ func (s *NounStorage) Insert(c model.Noun) (string, error) {
 	return c.GetID(), nil
 }
 
-// // Delete one :(
+// Delete
 func (s *NounStorage) Delete(id string) error {
 	delete := `DELETE FROM noun WHERE ID = ?`
 	result, err := s.db.Exec(delete, id)
 	numRowsDeleted, _ := result.RowsAffected()
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 	if numRowsDeleted == 0 {
@@ -88,9 +94,8 @@ func (s *NounStorage) Delete(id string) error {
 	return nil
 }
 
-// // Update a user
+// Update
 func (s *NounStorage) Update(c model.Noun) error {
-	fmt.Printf("%v", c)
 	_, err := s.db.NamedExec("UPDATE noun SET "+
 			"singular=:singular, "+
 			"plural=:plural "+
