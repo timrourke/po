@@ -22,31 +22,6 @@ type NounStorage struct {
 	db *sqlx.DB
 }
 
-// GetAll returns the noun map (because we need the ID as key too)
-// func (s NounStorage) GetAll() (model.ResultSet, error) {
-// 	rows, err := s.db.Queryx("SELECT * FROM noun ORDER BY id asc LIMIT 20")
-// 	defer rows.Close()
-
-// 	if err != nil {
-// 		log.Println(err)
-// 		return nil, err
-// 	}
-// 	results := make([]model.Noun, 0)
-// 	for rows.Next() {
-// 		var n model.Noun
-// 		err = rows.StructScan(&n)
-// 		log.Println(err)
-// 		results = append(results, n)
-// 	}
-
-// 	nounMap := make(model.ResultSet)
-// 	for i := range results {
-// 		n := results[i]
-// 		nounMap[n.ID] = &n
-// 	}
-// 	return nounMap, nil
-// }
-
 func (s NounStorage) GetAllPaginated(offset uint64, limit uint64, sort string) (model.ResultSet, error) {
 	sqlString := fmt.Sprintf("SELECT * FROM noun ORDER BY %s LIMIT ?,?", sort)
 	rows, err := s.db.Queryx(sqlString, offset, limit)
