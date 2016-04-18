@@ -42,8 +42,10 @@ func main() {
   )
 
   nounStorage := storage.NewNounStorage(db)
+  verbStorage := storage.NewVerbStorage(db)
 
   api.AddResource(model.Noun{}, resource.NounResource{NounStorage: nounStorage})
+  api.AddResource(model.Verb{}, resource.VerbResource{VerbStorage: verbStorage})
 
   r.GET("/ping", func(c *gin.Context) {
     c.String(200, "pong")
