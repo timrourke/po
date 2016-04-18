@@ -5,7 +5,7 @@ import (
   // "fmt"
   // "sort"
   // "strconv"
-  "database/sql"
+  "gopkg.in/guregu/null.v3"
   "github.com/manyminds/api2go/jsonapi"
 )
 
@@ -30,7 +30,7 @@ CREATE INDEX infinitive_index ON verb (infinitive) USING BTREE;
 // Base verb model type definition
 type Verb struct {
   Model
-  AuxVerbId       sql.NullInt64 `json:"auxiliaryVerb" db:"aux_verb_id"`
+  AuxVerbId       null.Int      `json:"auxiliaryVerb" db:"aux_verb_id"`
   Gerund          string        `json:"gerund" db:"gerund"`
   Infinitive      string        `json:"infinitive" db:"infinitive"`
   PastParticiple  string        `json:"pastParticiple" db:"past_participle"`

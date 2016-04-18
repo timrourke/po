@@ -2,7 +2,7 @@ package model
 
 import (
   // "database/sql/driver"
-  "github.com/go-sql-driver/mysql"
+  "gopkg.in/guregu/null.v3"
   "strconv"
   "time"
 )
@@ -10,7 +10,7 @@ import (
 type Model struct {
   ID        uint64          `json:"-" db:"id"`
   CreatedAt time.Time       `json:"createdAt" db:"created_at"`
-  UpdatedAt mysql.NullTime  `json:"updatedAt" db:"updated_at"`
+  UpdatedAt null.Time  `json:"updatedAt" db:"updated_at"`
 }
 
 type ModelInterface interface {
