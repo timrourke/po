@@ -8,8 +8,8 @@ import (
 	// "regexp"
 	"github.com/jmoiron/sqlx"
 	"github.com/manyminds/api2go"
-	"github.com/timrourke/po/model"
 	"github.com/timrourke/po/constraints"
+	"github.com/timrourke/po/model"
 	"log"
 )
 
@@ -97,9 +97,9 @@ func (s *NounStorage) Delete(id string) error {
 // Update
 func (s *NounStorage) Update(c model.Noun) error {
 	_, err := s.db.NamedExec("UPDATE noun SET "+
-			"singular=:singular, "+
-			"plural=:plural "+
-			"WHERE id = :id", c)
+		"singular=:singular, "+
+		"plural=:plural "+
+		"WHERE id = :id", c)
 	if err != nil {
 		fmt.Println(err)
 		return fmt.Errorf("Noun with id %s does not exist", c.ID)

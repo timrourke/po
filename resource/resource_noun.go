@@ -9,9 +9,9 @@ import (
 	// "strconv"
 
 	"github.com/manyminds/api2go"
+	"github.com/timrourke/po/constraints"
 	"github.com/timrourke/po/model"
 	"github.com/timrourke/po/storage"
-	"github.com/timrourke/po/constraints"
 )
 
 // NounResource for api2go routes
@@ -79,7 +79,7 @@ func (s NounResource) Delete(id string, r api2go.Request) (api2go.Responder, err
 	err := s.NounStorage.Delete(id)
 
 	if err != nil {
-		return &Response{Code: http.StatusNotFound}, api2go.NewHTTPError(err, err.Error(), http.StatusNotFound)		
+		return &Response{Code: http.StatusNotFound}, api2go.NewHTTPError(err, err.Error(), http.StatusNotFound)
 	}
 
 	return &Response{Code: http.StatusNoContent}, err

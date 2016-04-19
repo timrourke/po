@@ -9,9 +9,9 @@ import (
 	// "strconv"
 
 	"github.com/manyminds/api2go"
+	"github.com/timrourke/po/constraints"
 	"github.com/timrourke/po/model"
 	"github.com/timrourke/po/storage"
-	"github.com/timrourke/po/constraints"
 )
 
 // VerbResource for api2go routes
@@ -35,7 +35,7 @@ func (s VerbResource) FindAll(r api2go.Request) (api2go.Responder, error) {
 	return &Response{Res: verbs}, nil
 }
 
-// PaginatedFindAll 
+// PaginatedFindAll
 func (s VerbResource) PaginatedFindAll(r api2go.Request) (uint, api2go.Responder, error) {
 	queryConstraints, err := constraints.ApplyPaginatedConstraints(r)
 	if err != nil {
@@ -79,7 +79,7 @@ func (s VerbResource) Delete(id string, r api2go.Request) (api2go.Responder, err
 	err := s.VerbStorage.Delete(id)
 
 	if err != nil {
-		return &Response{Code: http.StatusNotFound}, api2go.NewHTTPError(err, err.Error(), http.StatusNotFound)		
+		return &Response{Code: http.StatusNotFound}, api2go.NewHTTPError(err, err.Error(), http.StatusNotFound)
 	}
 
 	return &Response{Code: http.StatusNoContent}, err

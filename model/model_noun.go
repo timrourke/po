@@ -1,12 +1,12 @@
 package model
 
 import (
-  //"errors"
-  // "fmt"
-  // "sort"
-  // "strconv"
+//"errors"
+// "fmt"
+// "sort"
+// "strconv"
 
-  //"github.com/manyminds/api2go/jsonapi"
+//"github.com/manyminds/api2go/jsonapi"
 )
 
 /* MySQL Schema
@@ -24,7 +24,7 @@ CREATE TABLE `noun` (
 
 // Base noun model type definition
 type Noun struct {
-  Model
-  Singular  string `json:"singular" db:"singular"`
-  Plural    string `json:"plural" db:"plural"`
+	Model
+	Singular string `json:"singular" db:"singular"`
+	Plural   string `json:"plural" db:"plural"`
 }

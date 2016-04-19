@@ -1,12 +1,12 @@
 package model
 
 import (
-  //"errors"
-  // "fmt"
-  // "sort"
-  // "strconv"
-  "gopkg.in/guregu/null.v3"
-  "github.com/manyminds/api2go/jsonapi"
+	//"errors"
+	// "fmt"
+	// "sort"
+	// "strconv"
+	"github.com/manyminds/api2go/jsonapi"
+	"gopkg.in/guregu/null.v3"
 )
 
 /* MySQL Schema
@@ -29,30 +29,29 @@ CREATE INDEX infinitive_index ON verb (infinitive) USING BTREE;
 
 // Base verb model type definition
 type Verb struct {
-  Model
-  AuxVerbId       null.Int      `json:"auxiliaryVerb" db:"aux_verb_id"`
-  Gerund          string        `json:"gerund" db:"gerund"`
-  Infinitive      string        `json:"infinitive" db:"infinitive"`
-  PastParticiple  string        `json:"pastParticiple" db:"past_participle"`
-  Reflexive       bool          `json:"reflexive" db:"reflexive"`
+	Model
+	AuxVerbId      null.Int `json:"auxiliaryVerb" db:"aux_verb_id"`
+	Gerund         string   `json:"gerund" db:"gerund"`
+	Infinitive     string   `json:"infinitive" db:"infinitive"`
+	PastParticiple string   `json:"pastParticiple" db:"past_participle"`
+	Reflexive      bool     `json:"reflexive" db:"reflexive"`
 }
 
 // Anonymous conjugations type definition for all verb tenses
 type Conjugations struct {
-  FirstPersonSingular   string `json:"firstPersonSingular" db:"sing_first"`
-  SecondPersonSingular  string `json:"secondPersonSingular" db:"sing_second"`
-  ThirdPersonSingular   string `json:"thirdPersonSingular" db:"sing_third"`
-  FirstPersonPlural     string `json:"firstPersonPlural" db:"plural_first"`
-  SecondPersonPlural    string `json:"secondPersonPlural" db:"plural_second"`
-  ThirdPersonPlural     string `json:"thirdPersonPlural" db:"plural_third"`
+	FirstPersonSingular  string `json:"firstPersonSingular" db:"sing_first"`
+	SecondPersonSingular string `json:"secondPersonSingular" db:"sing_second"`
+	ThirdPersonSingular  string `json:"thirdPersonSingular" db:"sing_third"`
+	FirstPersonPlural    string `json:"firstPersonPlural" db:"plural_first"`
+	SecondPersonPlural   string `json:"secondPersonPlural" db:"plural_second"`
+	ThirdPersonPlural    string `json:"thirdPersonPlural" db:"plural_third"`
 }
 
 func (v Verb) GetReferences() []jsonapi.Reference {
-  return []jsonapi.Reference{
-    {
-      Type: "verb",
-      Name: "auxiliaryVerb",
-    },
-
-  }
+	return []jsonapi.Reference{
+		{
+			Type: "verb",
+			Name: "auxiliaryVerb",
+		},
+	}
 }

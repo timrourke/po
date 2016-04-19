@@ -20,7 +20,7 @@ CREATE TABLE `tense_pres_ind` (
 
 // Base tense present indicative model type definition
 type TensePresentIndicative struct {
-  Model
-  VerbId  uint64 `json:"verb" db:"verb_id"`
-  Conjugations
+	Model
+	VerbId uint64 `json:"verb" db:"verb_id"`
+	Conjugations
 }

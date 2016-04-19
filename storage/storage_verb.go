@@ -8,8 +8,8 @@ import (
 	// "regexp"
 	"github.com/jmoiron/sqlx"
 	"github.com/manyminds/api2go"
-	"github.com/timrourke/po/model"
 	"github.com/timrourke/po/constraints"
+	"github.com/timrourke/po/model"
 	"log"
 )
 
@@ -93,12 +93,12 @@ func (s *VerbStorage) Delete(id string) error {
 // Update
 func (s *VerbStorage) Update(c model.Verb) error {
 	_, err := s.db.NamedExec("UPDATE verb SET "+
-			"aux_verb_id=:aux_verb_id, "+
-			"gerund=:gerund, "+
-			"infinitive=:infinitive, "+
-			"past_participle=:past_participle, "+
-			"reflexive=:reflexive "+
-			"WHERE id = :id", c)
+		"aux_verb_id=:aux_verb_id, "+
+		"gerund=:gerund, "+
+		"infinitive=:infinitive, "+
+		"past_participle=:past_participle, "+
+		"reflexive=:reflexive "+
+		"WHERE id = :id", c)
 	if err != nil {
 		fmt.Println(err)
 		return fmt.Errorf("Noun with id %s does not exist", c.ID)
