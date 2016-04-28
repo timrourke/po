@@ -24,7 +24,7 @@ type VerbStorage struct {
 }
 
 // Get all
-func (s VerbStorage) GetAllPaginated(constraints constraints.Constraints) (model.ResultSet, error) {
+func (s VerbStorage) GetAllPaginated(constraints constraints.PaginatedConstraints) (model.ResultSet, error) {
 	sqlString := fmt.Sprintf("SELECT * FROM verb ORDER BY %s LIMIT ?,?", constraints.Sort)
 	rows, err := s.db.Queryx(sqlString, constraints.Offset, constraints.Limit)
 	defer rows.Close()
@@ -35,7 +35,7 @@ func (s VerbStorage) GetAllPaginated(constraints constraints.Constraints) (model
 	}
 	results := make([]model.Verb, 0)
 	for rows.Next() {
-		var n model.Verb
+		n := model.NewVerb(s.db)
 		err = rows.StructScan(&n)
 		if err != nil {
 			return nil, err
@@ -53,10 +53,10 @@ func (s VerbStorage) GetAllPaginated(constraints constraints.Constraints) (model
 
 // Get one
 func (s VerbStorage) GetOne(id string) (model.Verb, error) {
-	verb := model.Verb{}
+	verb := model.NewVerb(s.db)
 	err := s.db.Get(&verb, `SELECT * FROM verb WHERE ID = ? LIMIT 1`, id)
 	if err != nil {
-		errMessage := fmt.Sprintf("Noun for id %s not found", id)
+		errMessage := fmt.Sprintf("Verb for id %s not found", id)
 		return model.Verb{}, api2go.NewHTTPError(errors.New(errMessage), errMessage, http.StatusNotFound)
 	}
 	return verb, nil
@@ -64,7 +64,7 @@ func (s VerbStorage) GetOne(id string) (model.Verb, error) {
 
 // Insert
 func (s *VerbStorage) Insert(c model.Verb) (string, error) {
-	verb := `INSERT INTO verb (aux_verb_id, gerund, infinitive, past_participle, reflexive) VALUES (?, ?, ?, ?, ?)`
+	verb := `INSERT INTO verb (created_at, aux_verb_id, gerund, infinitive, past_participle, reflexive) VALUES (NOW(), ?, ?, ?, ?, ?)`
 	result, err := s.db.Exec(verb, c.AuxVerbId, c.Gerund, c.Infinitive, c.PastParticiple, c.Reflexive)
 	insertId, err := result.LastInsertId()
 	if err != nil {
@@ -93,6 +93,7 @@ func (s *VerbStorage) Delete(id string) error {
 // Update
 func (s *VerbStorage) Update(c model.Verb) error {
 	_, err := s.db.NamedExec("UPDATE verb SET "+
+		"updated_at=NOW(), "+
 		"aux_verb_id=:aux_verb_id, "+
 		"gerund=:gerund, "+
 		"infinitive=:infinitive, "+
@@ -101,7 +102,7 @@ func (s *VerbStorage) Update(c model.Verb) error {
 		"WHERE id = :id", c)
 	if err != nil {
 		fmt.Println(err)
-		return fmt.Errorf("Noun with id %s does not exist", c.ID)
+		return fmt.Errorf("Verb with id %s does not exist", c.ID)
 	}
 
 	return nil

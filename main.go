@@ -43,9 +43,11 @@ func main() {
 
 	nounStorage := storage.NewNounStorage(db)
 	verbStorage := storage.NewVerbStorage(db)
+	tensePresIndStorage := storage.NewTensePresIndStorage(db)
 
 	api.AddResource(model.Noun{}, resource.NounResource{NounStorage: nounStorage})
 	api.AddResource(model.Verb{}, resource.VerbResource{VerbStorage: verbStorage})
+	api.AddResource(model.TensePresentIndicative{}, resource.TensePresIndResource{TensePresIndStorage: tensePresIndStorage})
 
 	r.GET("/ping", func(c *gin.Context) {
 		c.String(200, "pong")

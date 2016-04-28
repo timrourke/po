@@ -3,25 +3,48 @@ package constraints
 import (
 	"bytes"
 	"errors"
-	// "fmt"
+	// "log"
 	"net/http"
-	// "fmt"
 	"regexp"
 	"strconv"
+	"strings"
 
 	"github.com/manyminds/api2go"
 )
 
-type Constraints struct {
-	Offset uint64
-	Limit  uint64
-	Sort   string
+type SingleConstraints struct {
+	Includes map[string]struct{}
 }
 
-func ApplyPaginatedConstraints(r api2go.Request) (Constraints, error) {
+type PaginatedConstraints struct {
+	Offset   uint64
+	Limit    uint64
+	Sort     string
+	Includes map[string]struct{}
+}
+
+func ApplySingleConstraints(r api2go.Request) (SingleConstraints, error) {
+	var includeStrings []string
+
+	includeQuery, ok := r.QueryParams["include"]
+	if ok {
+		includeStrings = strings.Split(includeQuery[0], ".")
+	} else {
+		includeStrings = nil
+	}
+	includes := make(map[string]struct{}, 0)
+	for _, include := range includeStrings {
+		includes[include] = struct{}{}
+	}
+
+	return SingleConstraints{Includes: includes}, nil
+}
+
+func ApplyPaginatedConstraints(r api2go.Request) (PaginatedConstraints, error) {
 	var (
 		finalOffset, finalLimit           uint64
 		number, size, offset, limit, sort string
+		includeStrings                    []string
 	)
 	// Default constraints for queries
 	finalOffset = 0
@@ -58,7 +81,7 @@ func ApplyPaginatedConstraints(r api2go.Request) (Constraints, error) {
 			valid := regexp.MustCompile("^-?[A-Za-z0-9_.]+$")
 			if !valid.MatchString(sortQuery[i]) {
 				// invalid column name, do not proceed in order to prevent SQL injection
-				return Constraints{}, api2go.NewHTTPError(errors.New("Invalid query parameter for 'sort'."), "Invalid query parameter for 'sort'.", http.StatusBadRequest)
+				return PaginatedConstraints{}, api2go.NewHTTPError(errors.New("Invalid query parameter for 'sort'."), "Invalid query parameter for 'sort'.", http.StatusBadRequest)
 			}
 			if string(sortQuery[i][0]) == "-" {
 				buffer.WriteString(sortQuery[i][1:])
@@ -73,16 +96,26 @@ func ApplyPaginatedConstraints(r api2go.Request) (Constraints, error) {
 		}
 		sort = buffer.String()
 	}
+	includeQuery, ok := r.QueryParams["include"]
+	if ok {
+		includeStrings = strings.Split(includeQuery[0], ".")
+	} else {
+		includeStrings = nil
+	}
+	includes := make(map[string]struct{}, 0)
+	for _, include := range includeStrings {
+		includes[include] = struct{}{}
+	}
 
 	if size != "" {
 		sizeI, err := strconv.ParseUint(size, 10, 64)
 		if err != nil {
-			return Constraints{}, err
+			return PaginatedConstraints{}, err
 		}
 
 		numberI, err := strconv.ParseUint(number, 10, 64)
 		if err != nil {
-			return Constraints{}, err
+			return PaginatedConstraints{}, err
 		}
 
 		finalOffset = sizeI * (numberI - 1)
@@ -90,20 +123,21 @@ func ApplyPaginatedConstraints(r api2go.Request) (Constraints, error) {
 	} else if limit != "" {
 		limitI, err := strconv.ParseUint(limit, 10, 64)
 		if err != nil {
-			return Constraints{}, err
+			return PaginatedConstraints{}, err
 		}
 
 		offsetI, err := strconv.ParseUint(offset, 10, 64)
 		if err != nil {
-			return Constraints{}, err
+			return PaginatedConstraints{}, err
 		}
 
 		finalOffset = offsetI
 		finalLimit = limitI
 	}
 
-	return Constraints{
-		Offset: finalOffset,
-		Limit:  finalLimit,
-		Sort:   sort}, nil
+	return PaginatedConstraints{
+		Offset:   finalOffset,
+		Limit:    finalLimit,
+		Sort:     sort,
+		Includes: includes}, nil
 }

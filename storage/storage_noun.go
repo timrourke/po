@@ -24,12 +24,8 @@ type NounStorage struct {
 }
 
 // Get all
-func (s NounStorage) GetAllPaginated(constraints constraints.Constraints) (model.ResultSet, error) {
-	fmt.Println("we have a constraints struct", constraints)
-	fmt.Sprintf("%+v", constraints)
-	fmt.Println("Sort val should be: ", constraints.Sort)
+func (s NounStorage) GetAllPaginated(constraints constraints.PaginatedConstraints) (model.ResultSet, error) {
 	sqlString := fmt.Sprintf("SELECT * FROM noun ORDER BY %s LIMIT ?,?", constraints.Sort)
-	fmt.Println("sqlString", sqlString)
 	rows, err := s.db.Queryx(sqlString, constraints.Offset, constraints.Limit)
 	defer rows.Close()
 
