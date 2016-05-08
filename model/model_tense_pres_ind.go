@@ -1,9 +1,8 @@
 package model
 
 import (
-	// "github.com/timrourke/po/storage"
-	"github.com/jmoiron/sqlx"
 	"github.com/manyminds/api2go/jsonapi"
+	"github.com/timrourke/po/database"
 	"gopkg.in/guregu/null.v3"
 	"log"
 	"strconv"
@@ -27,17 +26,20 @@ CREATE TABLE `tense_pres_ind` (
 
 */
 
-func NewTensePresentIndicative(db *sqlx.DB, includes map[string]struct{}) TensePresentIndicative {
-	return TensePresentIndicative{db: db, includes: includes}
+func NewTensePresentIndicative(includes map[string]struct{}) TensePresentIndicative {
+	return TensePresentIndicative{includes: includes}
 }
 
 // Base tense present indicative model type definition
 type TensePresentIndicative struct {
-	db 				*sqlx.DB `json:"-" db:"-"` 
-	includes 		map[string]struct{} `json:"-" db:"-"`  
 	Model
-	VerbId 			null.Int `json:"verb_id" db:"verb_id"`
+	VerbId *null.Int `json:"verb_id" db:"verb_id"`
 	Conjugations
+	includes map[string]struct{} `json:"-" db:"-"`
+}
+
+func (t TensePresentIndicative) TableName() string {
+	return "tense_pres_ind"
 }
 
 func (t TensePresentIndicative) GetReferences() []jsonapi.Reference {
@@ -53,11 +55,11 @@ func (t TensePresentIndicative) GetReferences() []jsonapi.Reference {
 func (t TensePresentIndicative) GetReferencedIDs() []jsonapi.ReferenceID {
 	result := []jsonapi.ReferenceID{}
 	result = append(result, jsonapi.ReferenceID{
-		ID: 	strconv.FormatInt(t.VerbId.Int64, 10),
-		Type: 	"verbs",
-		Name: 	"verbs",
+		ID:   strconv.FormatInt(t.VerbId.Int64, 10),
+		Type: "verbs",
+		Name: "verbs",
 	})
-  return result
+	return result
 }
 
 // GetReferencedStructs to satisfy the jsonapi.MarhsalIncludedRelations interface
@@ -65,21 +67,21 @@ func (t TensePresentIndicative) GetReferencedStructs() []jsonapi.MarshalIdentifi
 	if len(t.includes) == 0 {
 		return nil
 	}
-	results := []jsonapi.MarshalIdentifier{} 
+	results := []jsonapi.MarshalIdentifier{}
 
 	_, ok := t.includes["verb"]
 	if ok {
-		verb := getRelatedVerb(t.db, t.VerbId)
+		verb := getRelatedVerb(*t.VerbId)
 		results = append(results, verb)
 	}
 
 	return results
 }
 
-func getRelatedVerb(db *sqlx.DB, id null.Int) jsonapi.MarshalIdentifier {
-	verb := NewVerb(db)
-	err := db.Get(&verb, "SELECT * FROM verb WHERE id = ? LIMIT 1", id)
-	if (err != nil) {
+func getRelatedVerb(id null.Int) jsonapi.MarshalIdentifier {
+	verb := Verb{}
+	err := database.DB.Get(&verb, "SELECT * FROM verb WHERE id = ? LIMIT 1", id)
+	if err != nil {
 		log.Println("Error retrieving referenced struct for TensePresentIndicative: ", id, err)
 		return verb
 	}

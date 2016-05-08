@@ -5,7 +5,7 @@ import (
 // "fmt"
 // "sort"
 // "strconv"
-
+// "github.com/timrourke/po/database"
 //"github.com/manyminds/api2go/jsonapi"
 )
 
@@ -25,6 +25,10 @@ CREATE TABLE `noun` (
 // Base noun model type definition
 type Noun struct {
 	Model
-	Singular string `json:"singular" db:"singular"`
-	Plural   string `json:"plural" db:"plural"`
+	Singular *string `json:"singular" db:"singular"`
+	Plural   *string `json:"plural" db:"plural"`
+}
+
+func (n Noun) TableName() string {
+	return "noun"
 }
