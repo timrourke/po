@@ -28,7 +28,7 @@ func ApplySingleConstraints(r api2go.Request) (SingleConstraints, error) {
 
 	includeQuery, ok := r.QueryParams["include"]
 	if ok {
-		includeStrings = strings.Split(includeQuery[0], ".")
+		includeStrings = strings.Split(includeQuery[0], ",")
 	} else {
 		includeStrings = nil
 	}
