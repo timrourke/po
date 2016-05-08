@@ -3,6 +3,7 @@ package resource
 import (
 	// "bytes"
 	"errors"
+	"log"
 	// "fmt"
 	"net/http"
 	// "regexp"
@@ -12,11 +13,12 @@ import (
 	"github.com/timrourke/po/constraints"
 	"github.com/timrourke/po/model"
 	"github.com/timrourke/po/storage"
+	"github.com/timrourke/validator"
 )
 
 // TensePresIndResource for api2go routes
 type TensePresIndResource struct {
-	TensePresIndStorage *storage.TensePresIndStorage
+	TensePresIndStorage storage.TensePresIndStorage
 }
 
 // FindAll to satisfy api2go data source interface
@@ -72,6 +74,8 @@ func (s TensePresIndResource) Create(obj interface{}, r api2go.Request) (api2go.
 	if !ok {
 		return &Response{}, api2go.NewHTTPError(errors.New("Invalid instance given"), "Invalid instance given", http.StatusBadRequest)
 	}
+	err := validator.Validate(tense)
+	log.Println(err)
 
 	id, _ := s.TensePresIndStorage.Insert(tense)
 	tense.SetID(id)

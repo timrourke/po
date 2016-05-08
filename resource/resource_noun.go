@@ -16,7 +16,7 @@ import (
 
 // NounResource for api2go routes
 type NounResource struct {
-	NounStorage *storage.NounStorage
+	NounStorage storage.NounStorage
 }
 
 // FindAll to satisfy api2go data source interface

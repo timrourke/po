@@ -1,22 +1,17 @@
 package resource
 
 import (
-	// "bytes"
 	"errors"
-	// "fmt"
-	"net/http"
-	// "regexp"
-	// "strconv"
-
 	"github.com/manyminds/api2go"
 	"github.com/timrourke/po/constraints"
 	"github.com/timrourke/po/model"
 	"github.com/timrourke/po/storage"
+	"net/http"
 )
 
 // VerbResource for api2go routes
 type VerbResource struct {
-	VerbStorage *storage.VerbStorage
+	VerbStorage storage.VerbStorage
 }
 
 // FindAll to satisfy api2go data source interface
