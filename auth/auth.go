@@ -31,7 +31,7 @@ func HandleLogin(c *gin.Context) (string, error) {
 	// Fail immediately if any error occurs
 	if err != nil {
 		log.Println("Error retrieving user:", err)
-		c.JSON(403, gin.H{
+		c.JSON(401, gin.H{
 			"status":  "Not authorized",
 			"message": "The email address or password was incorrect.",
 		})
@@ -43,7 +43,7 @@ func HandleLogin(c *gin.Context) (string, error) {
 	err = bcrypt.CompareHashAndPassword([]byte(*user.Password), []byte(credentials.Password))
 	if err != nil {
 		log.Println("Error authenticating user:", err)
-		c.JSON(403, gin.H{
+		c.JSON(401, gin.H{
 			"status":  "Not authorized",
 			"message": "The email address or password was incorrect.",
 		})
@@ -61,7 +61,10 @@ func HandleLogin(c *gin.Context) (string, error) {
 	token.Claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
 	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 	if err != nil {
-		c.JSON(500, gin.H{"message": "Could not log user in"})
+		c.JSON(500, gin.H{
+			"status":  "Error",
+			"message": "Could not log user in",
+		})
 		c.Abort()
 		return "", err
 	}
@@ -78,13 +81,19 @@ func HandleSignup(c *gin.Context) (string, model.User, error) {
 	err := database.DB.Get(&existingUser, "SELECT * FROM user WHERE email = ? LIMIT 1", credentials.Email)
 	if err != nil && err != sql.ErrNoRows {
 		log.Println("Error checking for existing user in signup", err)
-		c.JSON(500, gin.H{"message": "User signup failed"})
+		c.JSON(500, gin.H{
+			"status":  "Error",
+			"message": "User signup failed",
+		})
 		c.Abort()
 		return "", model.User{}, err
 	}
 	if *existingUser.Email == credentials.Email {
 		log.Println("User already exists, aborting signup")
-		c.JSON(500, gin.H{"message": fmt.Sprintf("A user with the email address %v is already taken", credentials.Email)})
+		c.JSON(409, gin.H{
+			"status":  "Conflict",
+			"message": fmt.Sprintf("A user with the email address %v is already taken", credentials.Email),
+		})
 		c.Abort()
 		return "", model.User{}, fmt.Errorf("A user with the email address %v is already taken", credentials.Email)
 	}
@@ -93,7 +102,10 @@ func HandleSignup(c *gin.Context) (string, model.User, error) {
 	bcryptedPassword, err := bcrypt.GenerateFromPassword([]byte(credentials.Password), 11)
 	if err != nil {
 		log.Println("Error bcrypting password for new user", err)
-		c.JSON(500, gin.H{"message": "User signup failed"})
+		c.JSON(500, gin.H{
+			"status":  "Error",
+			"message": "User signup failed",
+		})
 		c.Abort()
 		return "", model.User{}, err
 	}
@@ -111,14 +123,20 @@ func HandleSignup(c *gin.Context) (string, model.User, error) {
 		user.Password)
 	if err != nil {
 		log.Println("Error saving new user", err)
-		c.JSON(500, gin.H{"message": "User signup failed"})
+		c.JSON(500, gin.H{
+			"status":  "Error",
+			"message": "User signup failed",
+		})
 		c.Abort()
 		return "", model.User{}, err
 	}
 	insertId, err := result.LastInsertId()
 	if err != nil {
 		log.Println("Error saving new user and retrieving insert ID", err)
-		c.JSON(500, gin.H{"message": "User signup failed"})
+		c.JSON(500, gin.H{
+			"status":  "Error",
+			"message": "User signup failed",
+		})
 		c.Abort()
 		return "", model.User{}, err
 	}
@@ -130,7 +148,10 @@ func HandleSignup(c *gin.Context) (string, model.User, error) {
 	token.Claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
 	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 	if err != nil {
-		c.JSON(500, gin.H{"message": "Could not create token for new user"})
+		c.JSON(500, gin.H{
+			"status":  "Error",
+			"message": "Could not create token for new user",
+		})
 		c.Abort()
 		return "", model.User{}, err
 	}

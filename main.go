@@ -6,8 +6,8 @@ import (
 	"github.com/jmoiron/sqlx"
 	"net/http"
 	// "errors"
-	// "github.com/gin-gonic/contrib/jwt"
 	// "github.com/gin-gonic/contrib/sessions"
+	"github.com/gin-gonic/contrib/jwt"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -101,11 +101,8 @@ func main() {
 		http.ServeFile(c.Writer, c.Request, path)
 	})
 
-	// r.Use(func(c *gin.Context) {
-	// 	fmt.Printf("%+v", c.Request.Header)
-	// 	c.JSON(403, c.Request.Header)
-	// 	c.Abort()
-	// })
+	// All routes going forward are protected with JWT authorization
+	r.Use(jwt.Auth(os.Getenv("JWT_SECRET")))
 
 	nounStorage := storage.NounStorage{}
 	verbStorage := storage.VerbStorage{}
