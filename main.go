@@ -49,6 +49,8 @@ func init() {
 }
 
 func main() {
+	defer database.DB.Close()
+
 	r := gin.Default()
 
 	// Attempt to register sessions using redis
