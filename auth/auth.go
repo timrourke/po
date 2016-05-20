@@ -58,7 +58,7 @@ func HandleLogin(c *gin.Context) (string, error) {
 	// Build the token
 	token := jwt_lib.New(jwt_lib.GetSigningMethod("HS256"))
 	token.Claims["userid"] = user.GetID()
-	token.Claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
+	token.Claims["exp"] = time.Now().Add(time.Hour*72).Unix() * 1000
 	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 	if err != nil {
 		c.JSON(500, gin.H{
@@ -145,7 +145,7 @@ func HandleSignup(c *gin.Context) (string, model.User, error) {
 	// Build the token
 	token := jwt_lib.New(jwt_lib.GetSigningMethod("HS256"))
 	token.Claims["userid"] = user.GetID()
-	token.Claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
+	token.Claims["exp"] = time.Now().Add(time.Hour*72).Unix() * 1000
 	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
 	if err != nil {
 		c.JSON(500, gin.H{
