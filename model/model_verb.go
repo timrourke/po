@@ -29,10 +29,10 @@ CREATE INDEX infinitive_index ON verb (infinitive) USING BTREE;
 // Base verb model type definition
 type Verb struct {
 	Model
-	AuxVerbId      *null.Int `json:"auxiliaryVerb" db:"aux_verb_id"`
+	AuxVerbId      *null.Int `json:"auxiliary-verb" db:"aux_verb_id"`
 	Gerund         *string   `json:"gerund" db:"gerund"`
-	Infinitive     *string   `json:"infinitive" db:"infinitive"`
-	PastParticiple *string   `json:"pastParticiple" db:"past_participle"`
+	Infinitive     *string   `json:"infinitive" db:"infinitive" filterComparison:"like"`
+	PastParticiple *string   `json:"past-participle" db:"past_participle"`
 	Reflexive      *bool     `json:"reflexive" db:"reflexive"`
 }
 
@@ -42,12 +42,12 @@ func (v Verb) TableName() string {
 
 // Anonymous conjugations type definition for all verb tenses
 type Conjugations struct {
-	FirstPersonSingular  *string `json:"firstPersonSingular" db:"sing_first"`
-	SecondPersonSingular *string `json:"secondPersonSingular" db:"sing_second"`
-	ThirdPersonSingular  *string `json:"thirdPersonSingular" db:"sing_third"`
-	FirstPersonPlural    *string `json:"firstPersonPlural" db:"plural_first"`
-	SecondPersonPlural   *string `json:"secondPersonPlural" db:"plural_second"`
-	ThirdPersonPlural    *string `json:"thirdPersonPlural" db:"plural_third"`
+	FirstPersonSingular  *string `json:"first-person-singular" db:"sing_first"`
+	SecondPersonSingular *string `json:"second-person-singular" db:"sing_second"`
+	ThirdPersonSingular  *string `json:"third-person-singular" db:"sing_third"`
+	FirstPersonPlural    *string `json:"first-person-plural" db:"plural_first"`
+	SecondPersonPlural   *string `json:"second-person-plural" db:"plural_second"`
+	ThirdPersonPlural    *string `json:"third-person-plural" db:"plural_third"`
 }
 
 func (v Verb) GetReferences() []jsonapi.Reference {

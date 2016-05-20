@@ -33,7 +33,7 @@ func NewTensePresentIndicative(includes map[string]struct{}) TensePresentIndicat
 // Base tense present indicative model type definition
 type TensePresentIndicative struct {
 	Model
-	VerbId *null.Int `json:"verb_id" db:"verb_id"`
+	VerbId *null.Int `json:"verb" db:"verb_id"`
 	Conjugations
 	includes map[string]struct{} `json:"-" db:"-"`
 }
