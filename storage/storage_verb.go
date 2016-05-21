@@ -17,23 +17,13 @@ type VerbStorage struct{}
 
 // Get all
 func (s VerbStorage) GetAllPaginated(constraints constraints.PaginatedConstraints) (model.ResultSet, error) {
+	results := make([]model.Verb, 0)
 	sqlString := fmt.Sprintf("SELECT * FROM verb ORDER BY %s LIMIT ?,?", constraints.Sort)
-	rows, err := database.DB.Queryx(sqlString, constraints.Offset, constraints.Limit)
-	defer rows.Close()
+	err := database.DB.Select(&results, sqlString, constraints.Offset, constraints.Limit)
 
 	if err != nil {
 		log.Println(err)
 		return nil, err
-	}
-
-	results := make([]model.Verb, 0)
-	for rows.Next() {
-		n := model.Verb{}
-		err = rows.StructScan(&n)
-		if err != nil {
-			return nil, err
-		}
-		results = append(results, n)
 	}
 
 	var verbMap model.ResultSet

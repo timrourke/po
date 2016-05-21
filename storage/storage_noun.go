@@ -16,23 +16,13 @@ type NounStorage struct{}
 
 // Get all
 func (s NounStorage) GetAllPaginated(constraints constraints.PaginatedConstraints) (model.ResultSet, error) {
+	results := make([]model.Noun, 0)
 	sqlString := fmt.Sprintf("SELECT * FROM noun ORDER BY %s LIMIT ?,?", constraints.Sort)
-	rows, err := database.DB.Queryx(sqlString, constraints.Offset, constraints.Limit)
-	defer rows.Close()
+	err := database.DB.Select(&results, sqlString, constraints.Offset, constraints.Limit)
 
 	if err != nil {
 		log.Println(err)
 		return nil, err
-	}
-
-	results := make([]model.Noun, 0)
-	for rows.Next() {
-		var n model.Noun
-		err = rows.StructScan(&n)
-		if err != nil {
-			return nil, err
-		}
-		results = append(results, n)
 	}
 
 	var nounMap model.ResultSet
